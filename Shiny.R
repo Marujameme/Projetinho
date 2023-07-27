@@ -1,130 +1,179 @@
 library(shiny)
 library(DT)
-help(input)
 ui <- fluidPage(
   titlePanel("Tabelador listas UnB"),
   sidebarLayout(
-  sidebarPanel(
-    selectInput('Processo', 'Selecione o processo seletivo', selected = 'PAS', choices = c('PAS', 'ENEM', 'VESTIBULAR')),
-    textInput('lista', 'Digite a lista'),
-    actionButton('Tabelar', "Tabelar")),
-  mainPanel(
-    DT::DTOutput('dados'))
+    sidebarPanel(
+      selectInput('Processo', 'Selecione o processo seletivo', selected = 'PAS', choices = c('PAS', 'ENEM', 'VESTIBULAR')),
+      textInput('lista', 'Digite a lista'),
+      textInput("inscri", "digite os números de incrição que desja retirar", placeholder = "Ex: 14569870, 25406987, 45001455"),
+      actionButton('Tabelar', "Tabelar"),
+      actionButton("instru", "Instruções")),
+    mainPanel(
+      DT::DTOutput('dados'),
+      textOutput("teste"))
   ))
 
 server <- function(input, output, session){
+  m <- NULL
   rodar <- eventReactive(input$Tabelar, {
     if (input$Processo == 'PAS') {
-      char2 <- c(input$lista)
       
-      char3<-  (strsplit(char2, "/ "))
-      char4 <- unlist(strsplit(char3[[1]], ", "))
+      a <- c(input$lista)
+      b <- unlist(strsplit(a, "/ "))
+      c <- matrix(unlist(strsplit(b, ",")), byrow = TRUE, ncol = 22)
+      dados <- data.frame(c)
       
-      c_vetor_PAS <- function(x, i){
-        vetor <- c(1:(length(x)/22)) 
-        j = 1
-        while(i <= length(x)) {
-          vetor[j] <- x[i]
-          i = i + 22
-          j = j + 1
-        } 
-        return(vetor)
-      }
-      Nº <- c_vetor_PAS(char4, 1)
-      Nome <- c_vetor_PAS(char4, 2)
-      EB_p1_PAS_1 <- as.numeric(c_vetor_PAS(char4, 3))
-      EB_p2_PAS_1 <- as.numeric(c_vetor_PAS(char4, 4))
-      Redacao_PAS_1  <- as.numeric(c_vetor_PAS(char4, 5))
-      EB_p1_PAS_2 <- as.numeric(c_vetor_PAS(char4, 6))
-      EB_p2_PAS_2  <- as.numeric(c_vetor_PAS(char4, 7))
-      Redacao_PAS_2 <- as.numeric(c_vetor_PAS(char4, 8))
-      EB_p1_PAS_3 <- as.numeric(c_vetor_PAS(char4, 9))
-      EB_p2_PAS_3 <- as.numeric(c_vetor_PAS(char4, 10))
-      Redacao_PAS_3 <- as.numeric(c_vetor_PAS(char4, 11))
-      AF <- as.numeric(c_vetor_PAS(char4, 12))
-      U <- as.integer(c_vetor_PAS(char4, 13))
-      CN <- as.integer(c_vetor_PAS(char4, 14))
-      PPIm <- as.integer(c_vetor_PAS(char4, 15))
-      PPImd <- as.integer(c_vetor_PAS(char4, 16))
-      NPPIm <- as.integer(c_vetor_PAS(char4, 17))
-      NPPImd <- as.integer(c_vetor_PAS(char4, 18))
-      PPIM <- as.integer(c_vetor_PAS(char4, 19))
-      PPIMd <- as.integer(c_vetor_PAS(char4, 20))
-      NPPIM <- as.integer(c_vetor_PAS(char4, 21))
-      NPPIMd <- as.integer(c_vetor_PAS(char4, 22))
-      dados <- data.frame(Nº, Nome, EB_p1_PAS_1, EB_p2_PAS_1, Redacao_PAS_1, EB_p1_PAS_2, EB_p2_PAS_2, Redacao_PAS_2, 
-                          EB_p1_PAS_3, EB_p2_PAS_3, Redacao_PAS_3, AF, U, CN, PPIm, PPImd, NPPIm, NPPImd, PPIM, PPIMd, NPPIM, NPPIMd)
-      DT::datatable(dados)
+      names(dados)[names(dados) == 'X1'] <- 'Nº'
+      names(dados)[names(dados) == 'X2'] <- 'Nome'
+      names(dados)[names(dados) == 'X3'] <- 'EB_p1_PAS_1'
+      names(dados)[names(dados) == 'X4'] <- 'EB_p2_PAS_1'
+      names(dados)[names(dados) == 'X5'] <- 'Redacao_PAS_1'
+      names(dados)[names(dados) == 'X6'] <- 'EB_p1_PAS_2'
+      names(dados)[names(dados) == 'X7'] <- 'EB_p2_PAS_2'
+      names(dados)[names(dados) == 'X8'] <- 'Redacao_PAS_2'
+      names(dados)[names(dados) == 'X9'] <- 'EB_p1_PAS_3'
+      names(dados)[names(dados) == 'X10'] <- 'EB_p2_PAS_3'
+      names(dados)[names(dados) == 'X11'] <- 'Redacao_PAS_3'
+      names(dados)[names(dados) == 'X12'] <- 'AF'
+      names(dados)[names(dados) == 'X13'] <- 'U'
+      names(dados)[names(dados) == 'X14'] <- 'CN'
+      names(dados)[names(dados) == 'X15'] <- 'PPIm'
+      names(dados)[names(dados) == 'X16'] <- 'PPImd'
+      names(dados)[names(dados) == 'X17'] <- 'NPPIm'
+      names(dados)[names(dados) == 'X18'] <- 'NPPImd'
+      names(dados)[names(dados) == 'X19'] <- 'PPIM'
+      names(dados)[names(dados) == 'X20'] <- 'PPIMd'
+      names(dados)[names(dados) == 'X21'] <- 'NPPIM'
+      names(dados)[names(dados) == 'X22'] <- 'NPPIMd'
+      
+      dados$Nº <- as.integer(dados$Nº)
+      dados$EB_p1_PAS_1 <- as.numeric(dados$EB_p1_PAS_1)
+      dados$EB_p2_PAS_1 <- as.numeric(dados$EB_p2_PAS_1)
+      dados$Redacao_PAS_1 <- as.numeric(dados$Redacao_PAS_1)
+      dados$EB_p1_PAS_2 <- as.numeric(dados$EB_p1_PAS_2)
+      dados$EB_p2_PAS_2 <- as.numeric(dados$EB_p2_PAS_2)
+      dados$Redacao_PAS_2 <- as.numeric(dados$Redacao_PAS_2)
+      dados$EB_p1_PAS_3 <- as.numeric(dados$EB_p1_PAS_3)
+      dados$EB_p2_PAS_3 <- as.numeric(dados$EB_p2_PAS_3)
+      dados$Redacao_PAS_3 <- as.numeric(dados$Redacao_PAS_3)
+      dados$AF <- as.numeric(dados$AF)
+      dados$U <- as.integer(dados$U)
+      dados$CN <- as.integer(dados$CN)
+      dados$PPIm <- as.integer(dados$PPIm)
+      dados$PPImd <- as.integer(dados$PPImd)
+      dados$NPPIm <- as.integer(dados$NPPIm)
+      dados$NPPImd <- as.integer(dados$NPPImd)
+      dados$PPIM <- as.integer(dados$PPIM)
+      dados$PPIMd <- as.integer(dados$PPIMd)
+      dados$NPPIM <- as.integer(dados$NPPIM)
+      dados$NPPIMd <- as.integer(dados$NPPIMd)
+      
     } else if (input$Processo == 'ENEM') {
-      char2 <- c(input$lista)
+      a <- c(input$lista)
+      b <- unlist(strsplit(a, "/ "))
+      c <- matrix(unlist(strsplit(b, ",")), byrow = TRUE, ncol = 13)
+      dados <- data.frame(c)
       
-      char3<-  (strsplit(char2, "/ "))
-      char4 <- unlist(strsplit(char3[[1]], ", "))
+      names(dados)[names(dados) == 'X1'] <- 'Nº'
+      names(dados)[names(dados) == 'X2'] <- 'Nome'
+      names(dados)[names(dados) == 'X3'] <- 'Nota'
+      names(dados)[names(dados) == 'X4'] <- 'U'
+      names(dados)[names(dados) == 'X5'] <- 'CN'
+      names(dados)[names(dados) == 'X6'] <- 'PPIm'
+      names(dados)[names(dados) == 'X7'] <- 'PPImd'
+      names(dados)[names(dados) == 'X8'] <- 'NPPIm'
+      names(dados)[names(dados) == 'X9'] <- 'NPPImd'
+      names(dados)[names(dados) == 'X10'] <- 'PPIM'
+      names(dados)[names(dados) == 'X11'] <- 'PPIMd'
+      names(dados)[names(dados) == 'X12'] <- 'NPPIM'
+      names(dados)[names(dados) == 'X13'] <- 'NPPIMd'
       
-      c_vetor_ENEM <- function(x, i){
-        vetor <- c(1:(length(x)/13)) 
-        j = 1
-        while(i <= length(x)) {
-          vetor[j] <- x[i]
-          i = i + 13
-          j = j + 1
-        } 
-        return(vetor)
-      }
-      Nº <- c_vetor_ENEM(char4, 1)
-      Nome <- c_vetor_ENEM(char4, 2)
-      Nota <- as.numeric(c_vetor_ENEM(char4, 3))
-      U <- as.integer(c_vetor_ENEM(char4, 4))
-      CN <- as.integer(c_vetor_ENEM(char4, 5))
-      PPIm <- as.integer(c_vetor_ENEM(char4, 6))
-      PPImd <- as.integer(c_vetor_ENEM(char4, 7))
-      NPPIm <- as.integer(c_vetor_ENEM(char4, 8))
-      NPPImd <- as.integer(c_vetor_ENEM(char4, 9))
-      PPIM <- as.integer(c_vetor_ENEM(char4, 10))
-      PPIMd <- as.integer(c_vetor_ENEM(char4, 11))
-      NPPIM <- as.integer(c_vetor_ENEM(char4, 12))
-      NPPIMd <- as.integer(c_vetor_ENEM(char4, 13))
-      dados <- data.frame(Nº, Nome, Nota, U, CN, PPIm, PPImd, NPPIm, NPPImd, PPIM, PPIMd, NPPIM, NPPIMd)
-      DT::datatable(dados)
+      dados$Nº <- as.integer(dados$Nº)
+      dados$Nota <- as.numeric(dados$Nota)
+      dados$U <- as.integer(dados$U)
+      dados$CN <- as.integer(dados$CN)
+      dados$PPIm <- as.integer(dados$PPIm)
+      dados$PPImd <- as.integer(dados$PPImd)
+      dados$NPPIm <- as.integer(dados$NPPIm)
+      dados$NPPImd <- as.integer(dados$NPPImd)
+      dados$PPIM <- as.integer(dados$PPIM)
+      dados$PPIMd <- as.integer(dados$PPIMd)
+      dados$NPPIM <- as.integer(dados$NPPIM)
+      dados$NPPIMd <- as.integer(dados$NPPIMd)
+      
+      
     } else if (input$Processo == 'VESTIBULAR') {
-      char2 <- c(input$lista)
+      a <- c(input$lista)
+      b <- unlist(strsplit(a, "/ "))
+      c <- matrix(unlist(strsplit(b, ",")), byrow = TRUE, ncol = 17)
+      dados <- data.frame(c)
       
-      char3<-  (strsplit(char2, "/ "))
-      char4 <- unlist(strsplit(char3[[1]], ", "))
+      names(dados)[names(dados) == 'X1'] <- 'Nº'
+      names(dados)[names(dados) == 'X2'] <- 'Nome'
+      names(dados)[names(dados) == 'X3'] <- 'P1'
+      names(dados)[names(dados) == 'X4'] <- 'P2'
+      names(dados)[names(dados) == 'X5'] <- 'P3'
+      names(dados)[names(dados) == 'X6'] <- 'PR'
+      names(dados)[names(dados) == 'X7'] <- 'AF'
+      names(dados)[names(dados) == 'X8'] <- 'U'
+      names(dados)[names(dados) == 'X9'] <- 'CN'
+      names(dados)[names(dados) == 'X10'] <- 'PPIm'
+      names(dados)[names(dados) == 'X11'] <- 'PPImd'
+      names(dados)[names(dados) == 'X12'] <- 'NPPIm'
+      names(dados)[names(dados) == 'X13'] <- 'NPPImd'
+      names(dados)[names(dados) == 'X14'] <- 'PPIM'
+      names(dados)[names(dados) == 'X15'] <- 'PPIMd'
+      names(dados)[names(dados) == 'X16'] <- 'NPPIM'
+      names(dados)[names(dados) == 'X17'] <- 'NPPIMd'
       
-      c_vetor_VEST <- function(x, i){
-        vetor <- c(1:(length(x)/17)) 
-        j = 1
-        while(i <= length(x)) {
-          vetor[j] <- x[i]
-          i = i + 17
-          j = j + 1
-        } 
-        return(vetor)
-      }
-      Nº <- c_vetor_VEST(char4, 1)
-      Nome <- c_vetor_VEST(char4, 2)
-      P1 <- as.numeric(c_vetor_VEST(char4, 3))
-      P2 <- as.numeric(c_vetor_VEST(char4, 4))
-      P3 <- as.numeric(c_vetor_VEST(char4, 5))
-      PR <- as.numeric(c_vetor_VEST(char4, 6))
-      AF  <- as.numeric(c_vetor_VEST(char4, 7))
-      U <- as.integer(c_vetor_VEST(char4, 8))
-      CN <- as.integer(c_vetor_VEST(char4, 9))
-      PPIm <- as.integer(c_vetor_VEST(char4, 10))
-      PPImd <- as.integer(c_vetor_VEST(char4, 11))
-      NPPIm <- as.integer(c_vetor_VEST(char4, 12))
-      NPPImd <- as.integer(c_vetor_VEST(char4, 13))
-      PPIM <- as.integer(c_vetor_VEST(char4, 14))
-      PPIMd <- as.integer(c_vetor_VEST(char4, 15))
-      NPPIM <- as.integer(c_vetor_VEST(char4, 16))
-      NPPIMd <- as.integer(c_vetor_VEST(char4, 17))
-      dados <- data.frame(Nº, Nome, P1, P2, P3, PR, AF, U, CN, PPIm, PPImd, NPPIm, NPPImd, PPIM, PPIMd, NPPIM, NPPIMd)
-      DT::datatable(dados)
+      dados$Nº <- as.integer(dados$Nº)
+      dados$P1 <- as.numeric(dados$P1)
+      dados$P2 <- as.numeric(dados$P2)
+      dados$P3 <- as.numeric(dados$P3)
+      dados$PR <- as.numeric(dados$PR)
+      dados$AF <- as.numeric(dados$AF)
+      dados$U <- as.integer(dados$U)
+      dados$CN <- as.integer(dados$CN)
+      dados$PPIm <- as.integer(dados$PPIm)
+      dados$PPImd <- as.integer(dados$PPImd)
+      dados$NPPIm <- as.integer(dados$NPPIm)
+      dados$NPPImd <- as.integer(dados$NPPImd)
+      dados$PPIM <- as.integer(dados$PPIM)
+      dados$PPIMd <- as.integer(dados$PPIMd)
+      dados$NPPIM <- as.integer(dados$NPPIM)
+      dados$NPPIMd <- as.integer(dados$NPPIMd)
     }
-     })
+    
+    if (any(is.na(dados$Nº))){
+      dados <- NULL
+      showNotification("Veja se escolheu o processo seletivo correto e se as entradas foram copiadas corretamente.", type = "error")
+    } else if (input$inscri != ""){  
+      n <- unlist(strsplit(input$inscri, ","))
+      z <- as.integer(n)
+      v <- c()
+      for (i in 1:length(z)) {
+        v <- c(v, as.integer(row.names(dados[dados$Nº == z[i],])))
+      }
+      dados <- dados[-v, ]
+    }
+    dados
+  })
+  
   output$dados <- DT::renderDT({
-    rodar()
+    dados <- rodar()
+    DT::datatable(dados)
+  })
+  
+  observeEvent(input$instru,{
+    showModal(modalDialog(title = "Instruções", tags$div("Você deve primeiro selecionar o processo seletivo correto, e em seguida copiar a lista do curso que deseja ver diretamente do pdf que o cebraspe publica na página do processo e depois clicar em tabelar, e se desejar retirar alguém da lista é nescessário colocar o número de inscrição separando por vírgula por exemplo: 19888445, 13336654, 41525356. E clicar em tabelar novamente.", 
+                                                         tags$p(), "O foco do programa é para que o vestibulando possa acompanhar o processo e saber se ainda têm chance dito que quando um dos nomes chamados não faz o registro academico uma nova chamada é feita (Não existe um número de chamadas definido, veja os anos anteriores para ter ideia de quantas são feitas.) e aquela vaga vai para o candidato da próxima colocação seguindo respectivamente a cota.", 
+                                                         tags$p(), "As cotas podem descer quando não existe mais candidato na cota seguindo a seguinte ordem:", 
+                                                         tags$p(), "PPImd -> PPIm -> NPPImd -> NPPIm -> PPIMd -> PPIM -> NPPIMd -> NPPIM -> U",  
+                                                         tags$p(), "Observações:", 
+                                                         tags$p(), "a cota para negros não faz parte das cotas de escolas públicas então a vaga remanescente vai direto para a universal.", 
+                                                         tags$p(), "Para saber a nota de corte do respectivo sistema, basta conferir na lista da primeira chamada os convocados e verificar quem foi o último a passar no sistema respectivo, a nota do último convocado é a nota de corte do curso no ano respectivo.")
+    ))
   })
 }
 shinyApp(ui = ui, server = server)
